@@ -1,5 +1,5 @@
 # shsh
-Miscellaneous shell scripts, preferable Bourne classic syntax
+Miscellaneous shell scripts
 
 *path/path.sh - work with $PATH environment variable:
  - list elements
