@@ -14,7 +14,7 @@ rs2.sh - rsync wrapper for daily mirroring/backup
    of very significant working data, where CMS (git or mercurial) is not appropriate -
    photoarchives, home directory, document collections, etc.
    
-ddwipe.sh - wrapper for dd,
+ddwipe.sh - wrapper for dd
  - safely (real) destroy confidential data
  - test new flash media for real write speed
 
