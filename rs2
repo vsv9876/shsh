@@ -1,0 +1,112 @@
+#!/bin/sh
+
+# copy with rsync to 
+# destination specified with 1st arg
+# from source specified with 2nd arg
+#
+# exclude patterns configured in this script below
+
+#home
+#set -x
+#debug=echo
+
+dest=
+from=
+dryrun="n"
+delete="--delete"
+exconf=""
+homerc=""
+
+# mandatory ignored file patterns
+exconf=`echo \
+	--exclude='.cache/thumbnails' \
+	--exclude='.Trash' \
+	--exclude='*~' \
+`
+
+if [ $# -gt 0 ]; then
+  dest=$1
+  shift
+fi
+
+if [ $# -gt 0 ]; then
+  from=$1
+  shift
+fi
+
+usage() {
+	echo Usage: $0 'rsync_dst rsync_src [-R] [-N] [-c] [-x]'
+	echo '
+ flags:
+ -c only copy, no mirror with delete
+ -x real copy (no dry run)
+ -N ignore some config files
+ -R ignore home rc files and tmp like cache
+'
+	exit 1
+}
+
+while [ $# -gt 0 ]; do
+case "x$1" in
+  x-x)
+	shift;
+	dryrun=""
+	;;
+  x-c)
+	shift;
+	delete=""
+	;;
+  x-N)
+	shift;
+	# exclude non-portable config files (most, but not at all)
+	exconf=`echo "$exconf" \
+	--exclude='.config/akonadi/' \
+	--exclude='.kde/share/apps' \
+	--exclude='.kde/share/config/' \
+	--exclude='.local/share' \
+	--exclude='.pulse/' \
+`
+	;;
+  x-R)
+	shift;
+	# exclude non-portable config files (most, but not at all)
+	exconf=`echo "$exconf" \
+	--exclude='*[Cc]ache*' \
+	--exclude='.[Cc]ache' \
+	--exclude='.DCOP*' \
+	--exclude='.thumbnails' \
+	--exclude='.VirtualBox' \
+	--exclude='.gvfs' \
+	--exclude='target' \
+	--exclude='lost+found' \
+	--exclude='.tmp' \
+	--exclude='.rawstudio' \
+	--exclude='.serverauth.*' \
+	--exclude='.Xauthority' \
+	--exclude='.ICEauthority' \
+`
+	;;
+  x-*)
+	usage
+	;;
+esac
+done
+
+case $# in
+  0)
+	;;
+  *)
+	usage
+	;;
+esac
+
+
+##--exclude-from=${exclude}
+if [ x$from != x -a x$dest != x ]; then
+  exec ${debug} rsync -avlH${dryrun} \
+	$exconf \
+	$delete \
+	$from $dest
+else
+  usage
+fi
